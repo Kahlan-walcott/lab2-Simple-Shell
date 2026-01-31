@@ -10,7 +10,7 @@
 int main() {  
     char string[100];
     int n = 100;
-    pid_t pid, child;
+    pid_t pid;
     int status;
     struct rusage usage;
     while (1) { 
@@ -43,12 +43,17 @@ int main() {
         if (pid != 0) {
             wait(&status);
         }
-        if (execvp(word1, nullList) < 0) {  // what does the second value have to be here - this kind of works
-            perror("exec failed");  
-            exit(1);  
-        }  
-    }
+        if (getrusage(RUSAGE_SELF, &usage) == -1) {
+            perror("getrusage error");
+            exit(1);
+        }
+
+        printf("User CPU time used: %ld.%ld seconds.\n", usage.ru_utime.    tv_sec, usage.ru_utime.tv_usec);
+        printf("Involuntary context switches: %ld\n", usage.ru_nivcsw);
+
     
+    
+    }
     return 0;  
 }
 
